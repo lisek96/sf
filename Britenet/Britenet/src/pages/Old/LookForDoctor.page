@@ -1,0 +1,101 @@
+<apex:page id="LookForDoctor" controller="LookForDoctorController">
+
+    <style type="text/css">
+        .rightFields {
+            margin-left: 42%;
+            width: 150px;
+        }
+
+        .leftFields {
+            margin-left: 20%;
+            width: 150px;
+        }
+        .error{
+            color:cornflowerblue;
+            font-size: 12px;
+            margin-left: 40%;
+        }
+    </style>
+    <apex:pageMessages/>
+    <apex:sectionHeader title="Look for a doctor"/>
+    <apex:form>
+        <apex:pageBlock title="Search form">
+            <apex:outputText style="border: none" styleClass="error" rendered="{!showInfo}" value="{!info}"></apex:outputText>
+            <br></br><br></br>
+            <p>
+                <apex:inputText html-placeholder="First name" style="align: right" styleClass="leftFields" value="{!firstName}"/>
+                <apex:inputText html-placeholder="Last name" styleClass="rightFields" value="{!lastName}"/>
+            </p>
+            <p>
+                <apex:inputField required="false" styleClass="leftFields" value="{!doctor.Country__c}"></apex:inputField >
+            </p>
+            <p align="center">
+                <apex:commandButton  value="Search" action="{!save}"></apex:commandButton>
+                <apex:commandButton  value="Clear" action="{!clear}"></apex:commandButton>
+                <apex:commandButton  rendered="{!!foundDoctors.Empty}"  onclick="form.target='_blank'" value="Export to XLS" action="{!exportToXLS}"></apex:commandButton>
+                <apex:commandButton  rendered="{!!foundDoctors.Empty}"  onclick="form.target='_blank'" value="Export to CSV" action="{!exportToCSV}"></apex:commandButton>
+            </p>
+        </apex:pageBlock>
+        <apex:pageBlock title="Result form" rendered="{!!foundDoctors.Empty}" id="doctors_list">
+            <apex:pageBlockTable value="{!doctors}" var="doc">
+                <apex:column headerValue="Action">
+                    <apex:commandLink target="_blank" value="View" action="https://britenet81-dev-ed.my.salesforce.com/{!doc.Id}"/>
+                    &nbsp;|&nbsp;
+                    <apex:commandLink value="Edit" target="_blank"
+                                      action="https://britenet81-dev-ed.my.salesforce.com/a0609000002d7cN/e?retURL=%{!doc.Id}"/>
+                </apex:column>
+                <apex:column value="{! doc.First_Name__c}"/>
+                <apex:column value="{! doc.Last_Name__c }"/>
+                <apex:column value="{! doc.Birth_Date__c}"/>
+                <apex:column value="{! doc.Specialization__c }"/>
+                <apex:column value="{! doc.Country__c}"/>
+            </apex:pageBlockTable>
+            <table style="width: 100%">
+                <tr>
+                    <td>
+                        Page:
+                        <apex:outputText
+                                value=" {!setCon.PageNumber} of {! CEILING(setCon.ResultSize / setCon.PageSize) }"/>
+                    </td>
+                    <td align="center">
+                        <apex:commandLink action="{! setCon.first }" value="First"
+                                          rendered="{! setCon.HasPrevious }"/>
+                        <apex:outputText style="color: #ccc;" value="First"
+                                         rendered="{! NOT(setCon.HasPrevious) }"/>
+                        &nbsp;&nbsp;
+                        <apex:commandLink action="{! setCon.Previous }" value="« Previous"
+                                          rendered="{! setCon.HasPrevious }"/>
+
+                        <apex:outputText style="color: #ccc;" value="« Previous"
+                                         rendered="{! NOT(setCon.HasPrevious) }"/>
+                        &nbsp;&nbsp;
+
+                        <apex:commandLink action="{! setCon.Next }" value="Next »"
+                                          rendered="{! setCon.HasNext }"/>
+
+                        <apex:outputText style="color: #ccc;" value="Next »"
+                                         rendered="{! NOT(setCon.HasNext) }"/>
+                        &nbsp;&nbsp;
+                        <apex:commandLink action="{! setCon.last }" value="Last"
+                                          rendered="{! setCon.HasNext }"/>
+
+                        <apex:outputText style="color: #ccc;" value="Last"
+                                         rendered="{! NOT(setCon.HasNext) }"/>
+                    </td>
+                    <br></br>
+                    <td align="right">
+                        Records per page:
+                        <apex:selectList value="{!setCon.PageSize}" size="1">
+                            <apex:selectOption itemValue="1" itemLabel="1"/>
+                            <apex:selectOption itemValue="3" itemLabel="3"/>
+                            <apex:selectOption itemValue="20" itemLabel="20"/>
+                            <apex:actionSupport event="onchange" reRender="doctors_list"/>
+                        </apex:selectList>
+                    </td>
+                </tr>
+            </table>
+        </apex:pageBlock>
+
+    </apex:form>
+
+</apex:page>

@@ -1,0 +1,51 @@
+<!--
+ - Created by BRITENET on 05.05.2021.
+ -->
+
+<apex:page standardController="Hospital__c" extensions="HospitalEditPageController" id="HospitalEditPage">
+    <style>
+        .section .pbSubheader {
+            background-color: cornflowerblue !important;
+            color: black !important;
+        }
+        .buttons {
+            position: absolute;
+            margin-left: 500px;
+            margin-top: 10px;
+        }
+        .buttons2 {
+            position: absolute;
+            margin-left: 495px;
+            margin-top: 10px;
+        }
+    </style>
+    <apex:sectionHeader title="Hospital edit" subTitle="{!hospital.Name}"/>
+    <apex:form>
+        <div class="buttons">
+            <apex:commandButton action="{!save}" value="Save"/>
+            <apex:commandButton action="{!saveAndNew}" value="Save & New"/>
+            <apex:commandButton action="{!cancel}" value="Cancel"/>
+        </div>
+        <apex:pageBlock title="Hospital edit">
+            <apex:outputPanel layout="block" styleClass="section">
+                <apex:pageBlockSection columns="2" collapsible="false" title="Information">
+                    <apex:inputField required="true" label="Hospital name" value="{!hospital.Name}"/>
+                    <apex:inputField label="Country" value="{!hospital.Country__c}"/>
+                    <apex:inputField label="City" value="{!hospital.City__c}"/>
+                    <apex:inputField label="Street name" value="{!hospital.Street_Name__c}"/>
+                    <apex:inputField label="Street number" value="{!hospital.Street_Number__c}"/>
+                    <apex:inputField label="Type" value="{!hospital.Type__c}"/>
+                    <apex:inputField label="Public" value="{!hospital.Public__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="2" collapsible="false" title="System Information">
+                    <apex:outputField label="Owner" value="{!Hospital__c.Owner.Name}"/>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+            <div class="buttons2">
+                <apex:commandButton action="{!save}" value="Save"/>
+                <apex:commandButton action="{!saveAndNew}" value="Save & New"/>
+                <apex:commandButton action="{!cancel}" value="Cancel"/>
+            </div>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

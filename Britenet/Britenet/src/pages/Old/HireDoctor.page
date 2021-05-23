@@ -1,0 +1,19 @@
+<!--
+ - Created by BRITENET on 06.05.2021.
+ -->
+
+<apex:page id="HireDoctor">
+    <head>
+        <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"/>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    </head>
+    <div id="xx">xxxx</div>
+
+    <script>
+        j$ = jQuery.noConflict();
+        j$("#xx").dialog({
+            autoOpen: true,
+            width: 700
+        });</script>
+</apex:page>

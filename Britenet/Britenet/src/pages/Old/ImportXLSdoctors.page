@@ -1,0 +1,14 @@
+<apex:page Controller="DoctorsExporterController" contentType="application/vnd.ms-excel#doctors.xls">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    </head>
+    <apex:pageBlock>
+        <apex:pageBlockTable value="{!foundDoctors}" var="doctor">
+            <apex:column value="{!doctor.First_Name__c}"/>
+            <apex:column value="{!doctor.Last_Name__c }"/>
+            <apex:column value="{!doctor.Birth_Date__c}"/>
+            <apex:column value="{!doctor.Specialization__c }"/>
+            <apex:column value="{!doctor.Country__c}"/>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+</apex:page>

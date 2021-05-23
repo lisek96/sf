@@ -1,0 +1,406 @@
+<apex:page lightningStylesheets="true" controller="IntegratedOrgsDoctorsViewController">
+    <apex:includeScript value="{!URLFOR($Resource.jQueryUI,'/external/jquery/jquery.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jQueryUI,'/jquery-ui.js')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.jQueryUI,'/jquery-ui.css')}"/>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jcrop/0.9.12/js/jquery.Jcrop.min.js">
+    </script>
+    <style>
+        .viewLength {
+            margin-left: 570px;
+        }
+    </style>
+    <apex:slds/>
+
+    <div class="slds-panel slds-max-large-size_x-large slds-panel_docked slds-panel_docked-left slds-is-open"
+         aria-hidden="false">
+    </div>
+    <div style="color: blue" id="info" class="slds-text-heading_large slds-text-align_center">Info<br/></div>
+    <div id="spinner" class="demo-only" style="height:6rem;position:relative">
+        <div class="slds-spinner_container">
+            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slds-page-header">
+        <div class="slds-clearfix">
+            <div class="slds-float_right">
+                <p>
+                    <button id="newDoctorButton"
+                            style="margin-bottom: 20px; height: 30px"
+                            class="slds-button slds-button_neutral">New Doctor
+                    </button>
+                </p>
+            </div>
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+          <span class="slds-icon_container slds-icon-standard-opportunity" title="opportunity">
+            <span class="slds-assistive-text">opportunity</span>
+          </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-page-header__title slds-truncate"
+                                              title="Rohde Corp - 80,000 Widgets">Manage doctors from INTEGRATED organizations</span>
+                                    </h1>
+                                </div>
+                            </div>
+                            <p class="slds-page-header__name-meta">Create, retrieve, update, delete</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <apex:form id="xx">
+            <div class="slds-panel slds-max-large-size_x-large slds-panel_docked slds-panel_docked-left slds-is-open"
+                 aria-hidden="false">
+                <div class="slds-panel__body">
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col">
+                        <span><div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-1">
+                            First name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds soapDoctorCreds slds-input"
+                                            value="{!searchParams.FirstName}"/>
+                        </div>
+                    </div>
+                        </span>
+                        </div>
+                        <div class="slds-col">
+                        <span><div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-1">
+                            Last name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds slds-input"
+                                            value="{!searchParams.LastName}"/>
+                        </div>
+                    </div>
+                        </span>
+                        </div>
+                        <div class="slds-col">
+                        <span><div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-1">
+                            Email</label>
+                        <div class="slds-form-element__control">
+                           <apex:inputText styleClass="soapDoctorCreds soapDoctorCreds slds-input"
+                                           value="{!searchParams.Email}"/>
+                        </div>
+                    </div>
+                        </span>
+                        </div>
+                        <div class="slds-col">
+                        <span>
+                            <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-1">
+                           City</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds soapDoctorCreds slds-input"
+                                            value="{!searchParams.City}"/>
+                        </div>
+                    </div>
+                    </span>
+                        </div>
+                    </div>
+                    <br/> <br/>
+                    <div class="slds-grid">
+                        <div class="slds-col">
+                        <span> <apex:commandButton id="search" styleClass="slds-button slds-button_brand" action="{!getDoctors}"
+                                                   value="Search"/></span>
+                            <span>  <apex:commandButton styleClass="clearButton slds-button slds-button_neutral"
+                                                        value="Clear"/></span>
+                        </div>
+                    </div>
+                    <br/><br/>
+                    <div class="slds-scope">
+                        <div style="color: blue"
+                             class="slds-text-heading_medium slds-text-align_center">Retrieved doctors: {!retrievedDoctors.size}
+                        </div>
+                        <br/>
+                        <apex:pageBlock rendered="{!(retrievedDoctors.size!=0)}" id="retrievedTable" mode="maindetail">
+                            <apex:pageBlockTable styleClass="slds-table slds-table_cell-buffer slds-table_bordered"
+                                                 rows="{!shownDoctorsNumber}"
+                                                 value="{!retrievedDoctors}"
+                                                 var="doctor">
+                                <apex:column headerValue="Action">
+                                    <apex:commandLink id="deleteLink" onComplete="bindEvents()" action="{!assign}" value="Delete">
+                                        <apex:param
+                                                name="doctorToOperateOnId" value="{!doctor.IdDoctor}"
+                                                assignTo="{!doctorToOperateOnId}">
+                                        </apex:param>
+                                        <apex:param
+                                                name="doctorToOperateOnStatus" value="{!doctor.status}"
+                                                assignTo="{!doctorToOperateOnStatus}">
+                                        </apex:param>
+                                    </apex:commandLink>
+                                    &nbsp;|&nbsp;
+                                    <apex:commandLink action="{!assign}" reRender="doctorEditForm"
+                                                      id="editLink" value="Edit" onComplete="bindEvents()">
+                                        <apex:param name="doctorToEdit.IdDoctor" assignTo="{!doctorToEdit.IdDoctor}"
+                                                    value="{!doctor.IdDoctor}"/>
+                                        <apex:param name="doctorToEdit.FirstName"
+                                                    assignTo="{!doctorToEdit.firstName}"
+                                                    value="{!doctor.firstName}"/>
+                                        <apex:param name="doctorToEdit.LastName"
+                                                    assignTo="{!doctorToEdit.LastName}" value="{!doctor.LastName}"/>
+                                        <apex:param name="doctorToEdit.City" assignTo="{!doctorToEdit.City}"
+                                                    value="{!doctor.City}"/>
+                                        <apex:param name="doctorToEdit.Email" assignTo="{!doctorToEdit.Email}"
+                                                    value="{!doctor.Email}"/>
+                                        <apex:param name="doctorToEdit.externalId" assignTo="{!doctorToEdit.externalId}"
+                                                    value="{!doctor.externalId}"/>
+                                        <apex:param name="doctorToOperateOnStatus" assignTo="{!doctorToOperateOnStatus}"
+                                                    value="{!doctor.status}"></apex:param>
+                                    </apex:commandLink>
+
+                                </apex:column>
+                                <apex:column headerValue="First name" value="{! doctor.FirstName}"/>
+                                <apex:column headerValue="Last name" value="{! doctor.LastName }"/>
+                                <apex:column headerValue="Email" value="{! doctor.Email}"/>
+                                <apex:column headerValue="City" value="{!doctor.City}"/>
+                                <apex:column headerValue="Id" value="{!doctor.IdDoctor}"/>
+                                <apex:column headerValue="External ID" value="{!doctor.externalId}"/>
+                                <apex:column headerValue="Status" value="{!doctor.status}"/>
+                            </apex:pageBlockTable>
+                            <br/>
+                            <apex:commandLink style="color: blue "
+                                              styleClass="slds-text-title_bold slds-text-align_center slds-align_absolute-center"
+                                              action="{!showAllDoctors}"
+                                              rendered="{!shownDoctorsNumber==5 && retrievedDoctors.size!=0
+                                              && retrievedDoctors.size>5}"
+                                              value="Show all" onComplete="bindEvents()" reRender="xx"/>
+                            <apex:commandLink style="color: blue"
+                                              styleClass="slds-text-title_bold slds-text-align_center slds-align_absolute-center"
+                                              action="{!showFixedNumberOfDoctors}"
+                                              rendered="{!shownDoctorsNumber!=5 && retrievedDoctors.size!=0 && retrievedDoctors.size>5}"
+                                              value="Show less" onComplete="bindEvents()" reRender="xx"/>
+                        </apex:pageBlock>
+
+                    </div>
+                </div>
+            </div>
+        </apex:form>
+    </div>
+
+    <section id="updateDoctorDialog" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01"
+             aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+        <apex:form id="doctorEditForm">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close">
+                        <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+
+                        </svg>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Update doctor</h2>
+                </div>
+
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label_edit" for="text-input-id-1">
+                            First name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds slds-input" label="First name"
+                                            value="{!doctorToEdit.FirstName}"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label_edit" for="text-input-id-1">
+                            Last name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds slds-input" value="{!doctorToEdit.LastName}"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label_edit" for="text-input-id-1">
+                            Email</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds slds-input" value="{!doctorToEdit.Email}"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label_edit" for="text-input-id-1">
+                            City</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds slds-input" value="{!doctorToEdit.City}"/>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="slds-modal__footer slds-text-align_center">
+                    <apex:commandButton id="updateButton" styleClass="slds-button slds-button_brand" value="Update"
+                                        onComplete="doctorOperationDone('Doctor updated');" action="{!updateDoctor}"/>
+                    <button class="cancelButton slds-button slds-button_neutral">Cancel</button>
+                </div>
+            </div>
+        </apex:form>
+    </section>
+
+    <section id="newDoctorDialog" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01"
+             aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+        <apex:form>
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close">
+                        <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+
+                        </svg>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Create new doctor</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-5">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-1">
+                            <abbr class="slds-required" title="required">* </abbr>First name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds slds-input" label="First name"
+                                            value="{!doctorToCreate.FirstName}"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-1">
+                            <abbr class="slds-required" title="required">* </abbr>Last name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds slds-input" value="{!doctorToCreate.LastName}"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-1">
+                            <abbr class="slds-required" title="required">* </abbr>Email</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds slds-input" value="{!doctorToCreate.Email}"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="text-input-id-1">
+                            City</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText styleClass="soapDoctorCreds slds-input" value="{!doctorToCreate.City}"/>
+                        </div>
+                    </div>
+
+                </div>
+                <footer class="slds-modal__footer slds-text-align_center">
+                    <apex:commandButton onComplete="doctorOperationDone('Doctor created');" id="create" styleClass="slds-button slds-button_brand" value="Create"
+                                        action="{!createDoctor}"/>
+                    <button class="cancelButton slds-button slds-button_neutral">Cancel</button>
+                    <button class="clearButton slds-button slds-button_neutral">Clear</button>
+                </footer>
+            </div>
+        </apex:form>
+    </section>
+    <div class="slds-backdrop" id="createBackground"></div>
+
+
+    <section id="confirmDeleteDialog" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal">
+        <apex:form>
+        <div class="slds-modal__container">
+            <header class="slds-modal__header sds-c-modal-header-color-background">
+                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Delete doctor?</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <p>Do you really want to delete this doctor? You cannot turn this operation back.</p>
+            </div>
+            <div class="slds-modal__footer">
+                <apex:commandButton reRender="retrievedTable" onComplete="doctorOperationDone('Doctor Deleted');"
+                                    value="Delete" action="{!deleteDoctor}" id="ConfirmDeleteButton" styleClass="slds-button slds-button_destructive"></apex:commandButton>
+                <button id="CancelDeleteButton" class="slds-button slds-button_brand">Cancel</button>
+            </div>
+        </div>
+        </apex:form>
+    </section>
+    <div id="deleteBackGround" class="slds-backdrop"></div>
+    <script>
+        j$ = jQuery.noConflict();
+
+        function openNewDoctorDialog() {
+            j$("[id$=createBackground]").addClass('slds-backdrop--open');
+            j$("#newDoctorDialog").addClass('slds-fade-in-open');
+            clear();
+        }
+
+        function openEditDoctorDialog() {
+            j$("[id$=updateBackground]").addClass('slds-backdrop--open');
+            j$("#updateDoctorDialog").addClass('slds-fade-in-open');
+            j$(".clearButton").click(clear);
+            j$(".cancelButton").click(cancel);
+        }
+
+        function doctorOperationDone(msg){
+            j$("[id$=spinner]").hide();
+            j$("[id$=info]").html(msg);
+            j$("[id$=info]").show();
+            j$("[id$=createBackground]").removeClass('slds-backdrop--open');
+            j$("#newDoctorDialog").removeClass('slds-fade-in-open');
+            bindEvents();
+        }
+
+        function bindEvents() {
+            j$("[id$=updateButton]").click(function (){
+                j$("[id$=updateBackground]").removeClass('slds-backdrop--open');
+                j$("#updateDoctorDialog").removeClass('slds-fade-in-open');
+                j$("[id$=spinner]").show();
+            });
+            j$("[id$=editLink]").click(openEditDoctorDialog);
+            j$("#newDoctorButton").click(openNewDoctorDialog);
+            j$(".clearButton").click(clear);
+            j$(".cancelButton").click(cancel);
+            j$("[id$=deleteLink]").click(function (){
+                j$("[id$=deleteBackground]").addClass('slds-backdrop--open');
+                j$("#confirmDeleteDialog").addClass('slds-fade-in-open');
+            });
+            j$("[id$=ConfirmDeleteButton]").click(function (){
+                j$("[id$=deleteBackground]").removeClass('slds-backdrop--open');
+                j$("#confirmDeleteDialog").removeClass('slds-fade-in-open');
+                j$("[id$=spinner]").show();
+            });
+            j$("[id$=CancelDeleteButton]").click(function (){
+                j$("[id$=deleteBackground]").removeClass('slds-backdrop--open');
+                j$("#confirmDeleteDialog").removeClass('slds-fade-in-open');
+            });
+            j$("[id$=search").click(function (){
+                j$("[id$=spinner]").show();
+            })
+            j$("[id$=create").click(function (){
+                j$("[id$=spinner]").show();
+            })
+
+        }
+
+        j$(document).ready(function () {
+            bindEvents();
+            j$("[id$=spinner]").hide();
+            j$("[id$=info]").hide();
+        });
+
+        function clear() {
+            j$('.soapDoctorCreds').val('');
+            return false;
+        }
+
+        function cancel(event) {
+            event.preventDefault();
+            j$("[id$=createBackground]").removeClass('slds-backdrop--open');
+            j$("#newDoctorDialog").removeClass('slds-fade-in-open');
+            j$("[id$=updateBackground]").removeClass('slds-backdrop--open');
+            j$("#updateDoctorDialog").removeClass('slds-fade-in-open');
+            clear();
+            return false;
+        }
+
+
+
+    </script>
+</apex:page>

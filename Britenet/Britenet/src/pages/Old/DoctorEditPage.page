@@ -1,0 +1,49 @@
+<apex:page standardController="Doctor__c" extensions="EditDoctorPageController" id="EditDoctorPage">
+    <style>
+        .section .pbSubheader {
+            background-color: cornflowerblue !important;
+            color: black !important;
+        }
+        .buttons {
+            position: absolute;
+            margin-left: 500px;
+            margin-top: 10px;
+        }
+        .buttons2 {
+            position: absolute;
+            margin-left: 495px;
+            margin-top: 10px;
+        }
+    </style>
+    <apex:sectionHeader title="Doctor edit" subTitle="{!Doctor__c.Name}"/>
+    <apex:form>
+        <div class="buttons">
+            <apex:commandButton action="{!save}" value="Save"/>
+            <apex:commandButton action="{!saveAndNew}" value="Save & New"/>
+            <apex:commandButton action="{!cancel}" value="Cancel"/>
+        </div>
+        <apex:pageBlock title="Doctor edit">
+            <apex:outputPanel layout="block" styleClass="section">
+                <apex:pageBlockSection columns="2" collapsible="false" title="Information">
+                    <apex:inputField label="First name" value="{!doctor.First_Name__c}"/>
+                    <apex:inputField label="Last name" value="{!doctor.Last_Name__c}"/>
+                    <apex:inputField label="Birth date" value="{!doctor.Birth_Date__c}"/>
+                    <apex:inputField label="Country" value="{!doctor.Country__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="2" collapsible="false" title="Work information">
+                    <apex:inputField label="English" value="{!doctor.English__c}"/>
+                    <apex:inputField label="Specialization" value="{!doctor.Specialization__c}"/>
+                </apex:pageBlockSection>
+                <apex:pageBlockSection columns="2" collapsible="false" title="Contact">
+                    <apex:outputField label="Doctor name" value="{!Doctor__c.Name}"/>
+                    <apex:outputField label="Owner" value="{!Doctor__c.Owner.Name}"/>
+                </apex:pageBlockSection>
+            </apex:outputPanel>
+            <div class="buttons2">
+                <apex:commandButton action="{!save}" value="Save"/>
+                <apex:commandButton action="{!saveAndNew}" value="Save & New"/>
+                <apex:commandButton action="{!cancel}" value="Cancel"/>
+            </div>
+        </apex:pageBlock>
+        </apex:form>
+</apex:page>

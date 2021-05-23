@@ -1,0 +1,19 @@
+<!--
+ - Created by BRITENET on 23.05.2021.
+ -->
+
+<apex:page id="OnboardingEmailContent">
+    <div style="background-color: azure;" id="container">
+    <br/>
+    <h1 style="font-size: 24px; font-weight: bold; color: #1798c1;">Welcome on board!</h1>
+    <br/>
+        <p style="font-size: 20px; color: cornflowerblue">Hello <span style="font-size: 24px; font-weight: bold;"
+                       id="doctor">Rafał Wójcik</span>,
+            <br/>Today is your first day at work in szpital, we wish you amazing time!
+        </p>
+    <div class="img">
+    <apex:image height="130px" width="300px" url="{!$Resource.salesforceLogo}"/>
+    </div>
+
+    </div>
+</apex:page>

@@ -1,0 +1,77 @@
+<apex:page controller="LookForHospitalController" id="LookForHospitalPage">
+    <style>
+        .buttons {
+            margin-left: 550px;
+        }
+        .viewLength{
+            margin-left: 570px;
+        }
+    </style>
+    <apex:slds />
+    <div class="slds-scope">
+    <apex:form>
+        <apex:pageMessages></apex:pageMessages>
+        <apex:pageBlock title="Hire {!doctor.First_name__c} {!doctor.Last_name__c}">
+            <apex:pageBlock>
+                <apex:pageBlockSection columns="2">
+                    <apex:inputText label="Hospital name" html-placeholder="Hospital name" value="{!hospitalName}"/>
+                    <apex:inputField required="false" value="{!hospital.Country__c}"/>
+                </apex:pageBlockSection>
+                <div class="buttons">
+                    <apex:commandButton reRender="DoctorPage:j_id89:LookForHospitalPage:j_id93"
+                                        value="Search" action="{!search}"/>
+                    <apex:commandButton reRender="DoctorPage:j_id89:LookForHospitalPage:j_id93"
+                                        value="Clear" action="{!clear}"/>
+                </div>
+            </apex:pageBlock>
+            <apex:pageBlock id="searchResults" rendered="{!showTable}">
+                <apex:outputText value="Selected hospital: {!selectedHospitalName}" rendered="{!selectedHospitalId!=''}"></apex:outputText>
+                <br/><br/>
+                <apex:pageBlockTable rows="{!shownHospitalsNumber}" value="{!foundHospitals}" var="hospital">
+                    <apex:column headerValue="Action">
+                        <apex:commandLink rendered="{!selectedHospitalId!=hospital.Id}" reRender="DoctorPage:j_id89:LookForHospitalPage:j_id93" value="SELECT">
+                            <apex:param
+                                    name="selectedHospitalId" value="{!hospital.Id}" assignTo="{!selectedHospitalId}">
+                            </apex:param>
+                            <apex:param
+                                    name="selectedHospitalName" value="{!hospital.Name}" assignTo="{!selectedHospitalName}">
+                            </apex:param>
+                        </apex:commandLink>
+                    </apex:column>
+                    <apex:column value="{! hospital.Name}"/>
+                    <apex:column value="{! hospital.City__c }"/>
+                    <apex:column value="{! hospital.Country__c}"/>
+                    <apex:column value="{! hospital.Number_of_doctors__c }"/>
+                    <apex:column value="{! hospital.Min_salary__c}"/>
+                </apex:pageBlockTable>
+                <br/>
+                <apex:commandLink style="color: blue" styleClass="viewLength" rendered="{!shownHospitalsNumber==5}"
+                                  reRender="DoctorPage:j_id89:LookForHospitalPage:j_id93"
+                                  value="Show all" action="{!showAllDoctors}"/>
+                <apex:commandLink style="color: blue" styleClass="viewLength" rendered="{!shownHospitalsNumber!=5}"
+                                  reRender="DoctorPage:j_id89:LookForHospitalPage:j_id93"
+                                  value="Show less" action="{!showLessDoctors}"/>
+            </apex:pageBlock>
+            <apex:pageBlock rendered="{!selectedHospitalId!=''}">
+                <apex:pageBlockSection columns="2">
+                    <apex:commandLink reRender="DoctorPage:j_id89:LookForHospitalPage:j_id93"
+                                      value="Set first free dates"
+                                      action="{!getFirstFreeDatesForDoctorContract}"></apex:commandLink>
+
+                    <br/>
+                    <apex:inputField  label="Start date" html-placeholder="Start date" value="{!newContract.startDate__c}"/>
+                    <apex:inputField  label="End date" html-placeholder="End date" value="{!newContract.endDate__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            <apex:pageBlock  mode="maindetail">
+            <div class="buttons">
+                <apex:commandButton rendered="{!datesFilled}" id="hireButton"  value="Hire" action="{!hire}"/>
+                <apex:commandButton rendered="{!!datesFilled}" value="Hire" disabled="true"/>
+                <apex:commandButton id="closeButton" value="Close"/>
+            </div>
+            </apex:pageBlock>
+        </apex:pageBlock>
+    </apex:form>
+    </div>
+
+</apex:page>

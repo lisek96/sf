@@ -1,0 +1,90 @@
+<!--
+ - Created by BRITENET on 05.05.2021.
+ -->
+
+<apex:page extensions="HospitalPageController" standardController="Hospital__c" id="HospitalPage">
+    <style>
+        .Header {
+            font-weight: bold;
+            font-size: 16px;
+            margin-left: 10px;
+            margin-bottom: 5px;
+        }
+        .buttons{
+            display: inline;
+            margin-left: 400px;
+        }
+        .button2 {
+            position: absolute;
+            alignment: center;
+            margin-left: 400px;
+            margin-top: 5px;
+        }
+    </style>
+    <apex:form>
+        <apex:sectionHeader title="Hospital" subTitle="{!Hospital__c.Name}"/>
+        <h1 class="Header">Hospital Detail</h1>
+        <div class="buttons">
+            <apex:commandButton action="{!edit}" value="Edit"></apex:commandButton>
+            <apex:commandButton action="{!delete}" value="Delete"></apex:commandButton>
+        </div>
+        <apex:pageBlock mode="maindetail">
+            <apex:pageBlockSection columns="3" title="Information">
+                <apex:outputField label="Hospital name" value="{!Hospital__c.Name}"/>
+                <apex:outputField label="Country" value="{!Hospital__c.Country__c}"/>
+                <html-hr/>
+                <apex:outputField label="City" value="{!Hospital__c.City__c}"/>
+                <apex:outputField label="Street name" value="{!Hospital__c.Street_name__c}"/>
+                <html-hr/>
+                <apex:outputField label="City" value="{!Hospital__c.Street_number__c}"/>
+                <apex:outputField label="Street name" value="{!Hospital__c.Type__c}"/>
+                <html-hr/>
+                <apex:outputField label="Street name" value="{!Hospital__c.Public__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="3" title="Operational info">
+                <apex:outputField label="Cost of hiring doctors" value="{!Hospital__c.Cost_of_hiring_doctors__c}"/>
+                <apex:outputField label="Number of doctors" value="{!Hospital__c.Number_Of_Doctors__c}"/>
+                <html-hr/>
+                <apex:outputField label="Max salary" value="{!Hospital__c.Min_salary__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="3" title="System information">
+                <apex:pageBlockSectionItem>
+                    <apex:outputLabel for="owner" value="Owner"></apex:outputLabel>
+                    <apex:commandLink id="owner" value="{!Hospital__c.Owner.Name}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem>
+                    <apex:outputLabel value="Created By" for="createdBy"></apex:outputLabel>
+                    <apex:commandLink id="createdBy" value="{!Hospital__c.CreatedBy.Name}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <div class="button2">
+            <apex:commandButton action="{!createNewHospitalAndDoctor}" value="New Hospital & Doctor"></apex:commandButton>
+        </div>
+        <apex:pageBlock title="Hospitals & Doctors">
+            <apex:outputText styleClass="noRecordsInfo" value="No records to display"
+                             rendered="{!Hospital__c.Number_Of_Doctors__c==0}"/>
+            <apex:pageBlockTable rendered="{!Hospital__c.Number_Of_Doctors__c!=0}" id="hospitalsDoctorsList"
+                                 value="{!Hospital__c.Hospitals_Doctors__r}" var="hospitalDoctor">
+                <apex:column headerValue="Action">
+                    <apex:commandLink style="color: blue" target="_blank" value="Edit"
+                                      action="{!URLFOR($Action.Hospitals_Doctors__c.Edit, hospitalDoctor.Id)}"/>
+                    &nbsp;|&nbsp;
+                    <apex:commandLink style="color: blue" value="Del" action="{!deleteHospitalsDoctorsChildRecord}">
+                        <apex:param name="hospitalDoctorId" value="{!hospitalDoctor.id}" assignTo="{!hospitalDoctorId}"/>
+                    </apex:commandLink>
+
+                </apex:column>
+                <apex:column value="{!hospitalDoctor.Hospital__c}"/>
+                <apex:column headerValue="Doctors & Hospitals record name">
+                    <apex:commandLink  target="_blank" value="{!hospitalDoctor.Name}"
+                                      action="{!$Label.orgURL}{!hospitalDoctor.Id}"/>
+                </apex:column>
+                <apex:column value="{!hospitalDoctor.Hire_Date__c}"/>
+                <apex:column value="{!hospitalDoctor.Salary__c}"/>
+                <apex:column value="{!hospitalDoctor.startDate__c}"/>
+                <apex:column value="{!hospitalDoctor.endDate__c}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

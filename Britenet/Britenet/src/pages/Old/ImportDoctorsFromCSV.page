@@ -1,0 +1,87 @@
+<!--
+ - Created by BRITENET on 10.05.2021.
+ -->
+
+<apex:page controller="ImportDoctorsFromCSVcontroller" id="ImportDoctorsPage">
+    <apex:form>
+        <apex:pageMessages></apex:pageMessages>
+        <apex:includeScript value="{!URLFOR($Resource.jQueryUI,'/external/jquery/jquery.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.jQueryUI,'/jquery-ui.js')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.jQueryUI,'/jquery-ui.css')}"/>
+        <script type="text/javascript"
+                src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jcrop/0.9.12/js/jquery.Jcrop.min.js">
+        </script>
+        <style>
+            .importButtons{
+                position: absolute;
+                margin-left: 200px;
+
+            }
+            .selectButtons{
+                position: absolute;
+
+            }
+        </style>
+        <apex:pageBlock title="Import doctors">
+            <div style="font-size: 12px; font-weight: bold; color: dodgerblue;">Please choose CSV file.</div>
+            <br/>
+            <input type="file" accept=".csv" id="fileInput"/>
+            <apex:inputHidden id="fileInputForController" value="{!doctorsFile}"/>
+            <apex:commandButton value="Process" action="{!processDoctorsFile}"/>
+            <br/>
+            <apex:pageBlockTable value="{!wrappedDoctors}" var="wrappedDoctor">
+                <apex:column headerValue="Import">
+                    <apex:inputCheckbox value="{!wrappedDoctor.selected}"/>
+                </apex:column>
+                <apex:column headerValue="First name" value="{!wrappedDoctor.doctor.First_Name__c}"></apex:column>
+                <apex:column headerValue="Last name" value="{!wrappedDoctor.doctor.Last_Name__c}"></apex:column>
+                <apex:column headerValue="Email" value="{!wrappedDoctor.doctor.Email__c}"></apex:column>
+                <apex:column headerValue="Status">
+                    <apex:commandLink target="_blank" rendered="{!wrappedDoctor.status == 'Success'}"
+                                      action="{!view}" value="Success">
+                        <apex:param name="viewedDoctorId" value="{!wrappedDoctor.doctor.Id}"
+                                    assignTo="{!viewedDoctorId}"></apex:param>
+                    </apex:commandLink>
+                    <apex:outputText rendered="{!NOT(wrappedDoctor.status == 'Success')}"
+                                     value="{!wrappedDoctor.status}"></apex:outputText>
+                </apex:column>
+            </apex:pageBlockTable>
+            <br/>
+            <div class="buttonsDiv">
+                <span class="selectButtons">
+                <apex:commandButton rendered="{!enableButtons}" value="ALL" action="{!all}"/>
+                <apex:commandButton rendered="{!!enableButtons}" value="ALL" disabled="true"/>
+                <apex:commandButton rendered="{!enableButtons}" value="NONE" action="{!none}"/>
+                <apex:commandButton rendered="{!!enableButtons}" value="NONE" disabled="true"/>
+                <apex:commandButton rendered="{!enableButtons}" value="REVERSE" action="{!Reverse}"/>
+                <apex:commandButton rendered="{!!enableButtons}" value="REVERSE" disabled="true"/>
+                </span>
+                <span class="importButtons">
+                <apex:commandButton rendered="{!enableButtons}" value="IMPORT" action="{!ImportDoctors}"/>
+                <apex:commandButton rendered="{!!enableButtons}" value="IMPORT" disabled="true"/>
+                <apex:commandButton rendered="{!enableButtons}" value="CLEAR" action="{!Clear}"/>
+                <apex:commandButton rendered="{!!enableButtons}" value="CLEAR" disabled="true"/>
+                </span>
+            </div>
+            <br/><br/>
+        </apex:pageBlock>
+        <script>
+            j$ = jQuery.noConflict();
+
+            function onSaveResult() {
+                return false;
+            }
+            j$("#fileInput").change(function () {
+                var file = this;
+                if (file.files.length) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        console.log(e.target.result);
+                        j$('[id$=fileInputForController]').val(e.target.result);
+                    };
+                    reader.readAsText(file.files[0], 'utf-8');
+                }
+            });
+        </script>
+    </apex:form>
+</apex:page>

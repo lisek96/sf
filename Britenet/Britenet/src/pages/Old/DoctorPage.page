@@ -1,0 +1,258 @@
+<apex:page  standardController="Doctor__c" extensions="DoctorPageController" tabStyle="Doctor__c" id="DoctorPage">
+    <apex:includeScript value="{!URLFOR($Resource.jQueryUI,'/external/jquery/jquery.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jQueryUI,'/jquery-ui.js')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.jQueryUI,'/jquery-ui.css')}"/>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jcrop/0.9.12/js/jquery.Jcrop.min.js">
+    </script>
+    <apex:form>
+        <style>
+            .ui-dialog,.ui-widget, .ui-widget-content, .ui-corner-all, .foo, .ui-draggable, .ui-resizable {background:azure !important}
+            .avatarInputDiv {
+                margin-bottom: 50px;
+            }
+            .avatarAddInfo {
+                font-weight: bold;
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            .button2 {
+                position: absolute;
+                alignment: center;
+                margin-left: 450px;
+                margin-top: 8px;
+            }
+            .Header {
+                font-weight: bold;
+                font-size: 16px;
+                margin-left: 10px;
+            }
+            .buttons {
+                display: inline;
+                margin-left: 400px;
+            }
+            .avatar {
+                float: left;
+                margin-right: 10px;
+                margin-left: 5px;
+            }
+            .previewContainer {
+                width: 100%;
+                text-align: center;
+                display: inline;
+            }
+            .preview {
+                padding: 0;
+                margin: auto;
+                display: block;
+            }
+            .photoDialogButtons {
+                padding: 0;
+                margin-top: 50px;
+                text-align: center;
+            }
+        </style>
+        <apex:pageMessages></apex:pageMessages>
+        <apex:sectionHeader title="Doctor" subTitle="{!Doctor__c.Name}"/>
+        <h1 class="Header">Doctor Detail</h1>
+        <div class="buttons" style="display: inline">
+            <apex:commandButton action="{!edit}" value="Edit"></apex:commandButton>
+            <apex:commandButton value="Delete" action="{!delete}"></apex:commandButton>
+            <apex:commandButton onclick="openHireDialog();return false;" id="hireButton"
+                                value="Hire"></apex:commandButton>
+        </div>
+        <apex:pageBlock mode="maindetail">
+            <div class="avatar" style="float: left;">
+                <apex:image width="165px" height="165px"
+                            url="/servlet/servlet.FileDownload?file={!avatarFileId}"></apex:image>
+                <div class="imageButtons">
+                    <br/>
+                    <apex:commandButton onclick="openChangePhotoDialog();return false;"
+                                        value="New photo"></apex:commandButton>
+                    &nbsp;&nbsp;
+                    <apex:commandButton rendered="{!enableDeleteAvatarButton}" value="Delete photo" action="{!deleteAvatar}"></apex:commandButton>
+                    <apex:commandButton rendered="{!!enableDeleteAvatarButton}" value="Delete photo" disabled="true" ></apex:commandButton>
+                </div>
+            </div>
+            <apex:pageBlockSection html-style="overflow: auto" columns="3" title="Information">
+                <apex:outputField label="First name" value="{!Doctor__c.First_Name__c}"/>
+                <apex:outputField label="Last name" value="{!Doctor__c.Last_Name__c}"/>
+                <html-hr/>
+                <apex:outputField html-disabled="true" label="Birth date" value="{!Doctor__c.Birth_Date__c}"/>
+                <apex:outputField html-disabled="true" label="Country" value="{!Doctor__c.Country__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection html-style="overflow: auto" columns="3" title="Work information">
+                <apex:outputField html-disabled="true" label="Active" value="{!Doctor__c.Active__c}"/>
+                <apex:outputField html-disabled="true" label="Hired in" value="{!Doctor__c.Hired_in__c}"/>
+                <html-hr/>
+                <apex:outputField html-disabled="true" label="Income" value="{!Doctor__c.Income__c}"/>
+                <apex:outputField html-disabled="true" label="Specialization" value="{!Doctor__c.Specialization__c}"/>
+                <html-hr/>
+                <apex:outputField html-disabled="true" label="English" value="{!Doctor__c.English__c}"/>
+            </apex:pageBlockSection>
+            <br/><br/>
+            <apex:pageBlockSection columns="2" title="Contact">
+                <apex:outputField html-disabled="true" label="Email" value="{!Doctor__c.Email__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="3" html-style="overflow: auto" title="System Information">
+                <apex:outputField label="Doctor name" value="{!Doctor__c.Name}"/>
+                <apex:pageBlockSectionItem>
+                    <apex:outputLabel value="Created By" for="createdBy"></apex:outputLabel>
+                    <apex:commandLink id="createdBy" value="{!Doctor__c.CreatedBy.Name}"/>
+                </apex:pageBlockSectionItem>
+                <html-hr/>
+                <apex:pageBlockSectionItem>
+                    <apex:outputLabel value="Last Modified By" for="modifiedBy"></apex:outputLabel>
+                    <apex:commandLink id="modifiedBy" value="{!Doctor__c.CreatedBy.Name}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem>
+                    <apex:outputLabel for="owner" value="Owner"></apex:outputLabel>
+                    <apex:commandLink id="owner" value="{!Doctor__c.CreatedBy.Name}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <div class="button2">
+            <apex:commandButton action="{!createNewHospitalAndDoctor}"
+                                value="New contract"></apex:commandButton>
+        </div>
+        <apex:pageBlock title="Hospitals & Doctors">
+            <apex:outputText styleClass="noRecordsInfo" value="No records to display"
+                             rendered="{!Doctor__c.Hired_in__c==0}"/>
+            <apex:pageBlockTable rendered="{!Doctor__c.Hired_in__c!=0}" id="list"
+                                 value="{!Doctor__c.Hospitals_Doctors__r}" var="hospitalDoctor">
+                <apex:column headerValue="Action">
+                    <apex:commandLink style="color: blue" target="_blank" value="Edit"
+                                      action="{!$Label.orgURL}{!hospitalDoctor.Id}/e"/>
+                    &nbsp;|&nbsp;
+                    <apex:commandLink style="color: blue" value="Del" target="_blank"
+                                      action="{!URLFOR($Action.Hospitals_Doctors__c.delete, hospitalDoctor.Id)}"/>
+                </apex:column>
+                <apex:column value="{!hospitalDoctor.Hospital__c}"/>
+                <apex:column headerValue="Contract name">
+                    <apex:commandLink target="_blank" value="{!hospitalDoctor.Name}"
+                                      action="{!$Label.orgURL}{!hospitalDoctor.Id}"/>
+                </apex:column>
+                <apex:column value="{!hospitalDoctor.Hire_Date__c}"/>
+                <apex:column value="{!hospitalDoctor.Salary__c}"/>
+                <apex:column value="{!hospitalDoctor.startDate__c}"/>
+                <apex:column value="{!hospitalDoctor.endDate__c}"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+
+    </apex:form>
+
+    <div style="display: none" id="hire">
+        <apex:include pageName="LookForHospitalPage">
+        </apex:include>
+    </div>
+    <div style="display: none; background-color:azure" id="photoDialogContent">
+        <div class="avatarInputDiv">
+            <div class="avatarAddInfo">Please choose file. Avaible formats: jpeg, jpg, png, Max 3MB</div>
+            <input type="file" accept=".jpeg, .jpg, .png" id="imgInp"/>
+        </div>
+        <div class="crop" style="float: left;" id="targetContainer">
+            <img width="400" height="400" id="target" src="#" style="border:1px solid"/>
+        </div>
+        <div class="previewContainer">
+            <span class="preview">
+            <canvas id="preview" width="165" height="165"
+                    style="border:1px solid;"></canvas>
+            <div class="photoDialogButtons">
+            <button id="saveImageButton" onclick="saveImage()">Save</button>
+            <button id="cancelPhoto">Cancel</button>
+            </div>
+            </span>
+        </div>
+    </div>
+    <script>
+
+        j$ = jQuery.noConflict();
+        j$("#closeButton").onclick = function () {
+            j$("#hire").dialog("close");
+        }
+        j$("#saveImageButton").hide();
+        function openHireDialog() {
+            j$("#hire").dialog({
+                autoOpen: true,
+                width: 1400,
+                height: 600
+
+            });
+            j$("#hire").display = "block";
+        }
+
+        function openChangePhotoDialog() {
+            j$("#photoDialogContent").dialog({
+                autoOpen: true,
+                width: 800,
+                height: 600
+            });
+            j$("#photoDialogContent").display = "block";
+        }
+        j$("#cancelPhoto").click(closeChangePhotoDialog);
+        function closeChangePhotoDialog(){
+            j$("#photoDialogContent").dialog("destroy");
+            j$("#photoDialogContent").display = "none";
+            j$('[id$=imgInp]').val('');
+            clearSourceAndPreview('<img width="400" height="400" id="target" src="#" style="border:1px solid"/>', true);
+        }
+
+        j$("#hireButton").onclick = function () {
+            j$("#hire").dialog("destroy");
+        }
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                fileName = input.files[0].name;
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    clearSourceAndPreview('<img id="target" src="#" style="border:1px solid"/>',false);
+                    j$('#target').attr('src', e.target.result);
+                    j$('#target').Jcrop({
+                        onChange: updatePreview,
+                        onSelect: updatePreview,
+                        boxWidth: 400,
+                        boxHeight: 400,
+                        aspectRatio: 1
+                    });
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        j$("#imgInp").change(function () {
+            readURL(this);
+        });
+
+        function updatePreview(c) {
+            j$("#saveImageButton").show();
+            var imageObj = j$("#target")[0];
+            canvas = j$("#preview")[0];
+            var context = canvas.getContext("2d");
+            context.drawImage(imageObj, c.x, c.y, c.w, c.h, 0, 0, canvas.width, canvas.height);
+        };
+
+        function clearSourceAndPreview(img, hide) {
+            j$("#targetContainer").html('');
+            let newImage = img;
+            j$("#targetContainer").prepend(newImage);
+            canvas = j$("#preview")[0];
+            var context = canvas.getContext("2d");
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            if(hide==true) j$("#saveImageButton").hide();
+        };
+
+        function onSaveResult(result, event) {
+            window.location.href=window.location.href;
+        }
+
+        function saveImage() {
+            fileName='avatar';
+            var doctor = '{!Doctor__c.Id}';
+            canvas = j$("#preview")[0];
+            var p1 = canvas.toDataURL("image/png").match(/data:(.+);base64,(.+)/);
+            {!$RemoteAction.DoctorPageController.saveImage}(fileName, p1[1], p1[2], doctor, onSaveResult);
+            return false;
+        }
+    </script>
+</apex:page>

@@ -1,0 +1,3 @@
+<apex:page Controller="DoctorsExporterController" contentType="text/csv#doctors.csv">
+    <apex:outputText value="{!doctorsCSV}"></apex:outputText>
+</apex:page>
