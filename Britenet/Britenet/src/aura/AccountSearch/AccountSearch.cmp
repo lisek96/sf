@@ -1,0 +1,15 @@
+<aura:component controller="AccountSearchController" implements="flexipage:availableForAllPageTypes" description="AccountSearch">
+
+        <aura:attribute type="Account[]" name="accounts"></aura:attribute>
+
+        <lightning:card title="Account search">
+            <div style="margin-left: 10px" class="align-slds-form_horizontal slds-form slds-grid slds-wrap">
+                <lightning:input aura:id="nameInput" type="text" class="slds-size_1-of-5" placeholder="Account name"></lightning:input>
+                <lightning:input aura:id="countryInput" style="margin-left: 10px" type="text" class="slds-size_1-of-5" placeholder="Country"></lightning:input>
+            </div>
+            <div style="margin-top: 20px; margin-left: 298px;" class="slds-text-align_left slds-form_horizontal slds-form slds-grid slds-wrap">
+                <lightning:button onclick="{!c.search}" variant="brand" label="Search"></lightning:button>
+                <span style="margin-left: 10px"><lightning:button onclick="{!c.clear}" variant="neutral" label="Clear"></lightning:button></span>
+            </div>
+        </lightning:card>
+</aura:component>

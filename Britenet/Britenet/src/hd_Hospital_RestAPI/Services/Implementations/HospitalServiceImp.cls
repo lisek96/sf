@@ -89,8 +89,8 @@ public with sharing class HospitalServiceImp implements HospitalService {
         RestContext.response.statusCode = SUCCESS_CODE;
         return new DoctorServiceResponse()
                 .setStatusCode(SUCCESS_CODE)
-                .setMessage(msg)
-                .setObj(obj);
+                .setMessage(msg);
+
     }
 
     private static DoctorServiceResponse handleError(Exception e) {
